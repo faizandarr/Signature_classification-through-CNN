@@ -2,6 +2,20 @@ import cv2
 import os
 import numpy as np
 
+
+def calculate_scale_percent(img, max_dimension=800):
+    
+    original_width = img.shape[1]
+    original_height = img.shape[0]
+
+    # Find the larger dimension (width or height)
+    largest_dimension = max(original_width, original_height)
+    
+    # Calculate the scaling percent to reduce the largest dimension to max_dimension
+    scale_percent = (max_dimension / largest_dimension) * 100
+    
+    return scale_percent
+
 # Define the path to the folder containing the images
 input_folder = 'D:\\University\\Semester 7\\Generative AI\\Assignment_1\\Signature_classification\\Data'
 output_folder = 'Contours'
@@ -19,7 +33,7 @@ image_files = sorted([f for f in os.listdir(input_folder) if f.endswith(('.jpg',
                      key=lambda x: int(os.path.splitext(x)[0]))
 
 # Process each image in the folder
-for image_file in image_files:
+for image_file in image_files:#['D:\\University\\Semester 7\\Generative AI\\Assignment_1\\Signature_classification\Data\\11.jpg']:#
     img_path = os.path.join(input_folder, image_file)
     img = cv2.imread(img_path)
     
@@ -28,7 +42,7 @@ for image_file in image_files:
         continue
 
     # Resize the image for better performance (adjust scale_percent as needed)
-    scale_percent = 60  # you can adjust this based on your image size
+    scale_percent =  scale_percent = calculate_scale_percent(img, max_dimension=4650)
     width = int(img.shape[1] * scale_percent / 100)
     height = int(img.shape[0] * scale_percent / 100)
     dim = (width, height)
@@ -57,8 +71,10 @@ for image_file in image_files:
     # Find contours of each cell in the grid
     contours, _ = cv2.findContours(closed, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
+
+
     # Define a minimum and maximum area threshold to filter out small contours (signatures)
-    min_contour_area = 195000  # Minimum area for grid cells (adjust as needed)
+    min_contour_area = 200000  # Minimum area for grid cells (adjust as needed)
     max_contour_area = 300000  # Maximum area for grid cells (adjust as needed)
 
     # Define an aspect ratio range for grid cells
@@ -111,4 +127,4 @@ for image_file in image_files:
     #cv2.destroyAllWindows()
 
     # Save the result for the current image
-    cv2.imwrite(os.path.join(output_folder, f'Whole_{image_file}'), result)
+    cv2.imwrite(os.path.join(output_folder, f'Classification{image_file}'), result)
